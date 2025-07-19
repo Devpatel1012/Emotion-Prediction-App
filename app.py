@@ -65,6 +65,7 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     """Handles prediction requests from the UI."""
+    print("Received data:", data)  # ✅ Add this
     if model is None or tokenizer is None:
         return jsonify({"error": "Model or tokenizer not loaded. Server might be misconfigured."}), 500
 
