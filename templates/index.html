@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Classifier - AI-Powered Text Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <div class="badge">
+                <i class="fas fa-brain"></i>
+                AI-Powered Emotion Detection
+            </div>
+            <h1 class="main-title">Emotion Classifier</h1>
+            <p class="subtitle">
+                Discover the emotional tone of any text using advanced deep learning. Our bidirectional LSTM model analyzes text and identifies six core emotions with high accuracy.
+            </p>
+            <div class="emotion-tags">
+                <div class="emotion-tag">
+                    <i class="fas fa-heart emotion-love"></i>
+                    Love
+                </div>
+                <div class="emotion-tag">
+                    <i class="fas fa-smile emotion-joy"></i>
+                    Joy
+                </div>
+                <div class="emotion-tag">
+                    <i class="fas fa-frown emotion-sadness"></i>
+                    Sadness
+                </div>
+                <div class="emotion-tag">
+                    <i class="fas fa-angry emotion-anger"></i>
+                    Anger
+                </div>
+                <div class="emotion-tag">
+                    <i class="fas fa-exclamation-triangle emotion-fear"></i>
+                    Fear
+                </div>
+                <div class="emotion-tag">
+                    <i class="fas fa-surprise emotion-surprise"></i>
+                    Surprise
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Demo Section -->
+    <section class="demo-section">
+        <div class="container">
+            <div class="demo-card">
+                <div class="demo-header">
+                    <h2 class="demo-title">Try It Now</h2>
+                    <p class="demo-description">Enter any text below to analyze its emotional content</p>
+                </div>
+                
+                <div class="input-group">
+                    <textarea 
+                        id="inputText" 
+                        class="text-input" 
+                        placeholder="Enter text here to classify its emotion... (e.g., 'I'm so excited about my vacation tomorrow!')"
+                    ></textarea>
+                </div>
+                
+                <button id="analyzeBtn" class="analyze-btn" onclick="classifyEmotion()">
+                    <i class="fas fa-bolt"></i>
+                    <span id="btnText">Classify Emotion</span>
+                </button>
+                
+                <div id="errorMessage" class="error-message"></div>
+                
+                <!-- Results Display - Matching the exact format from your image -->
+                <div id="resultsCard" class="results-card">
+                    <div class="result-header">
+                        <div class="result-icon-container">
+                            <i id="resultIcon" class="fas fa-heart"></i>
+                        </div>
+                        <div class="result-info">
+                            <span id="resultEmotion" class="result-emotion">Joy</span>
+                            <span id="resultConfidence" class="result-confidence">85.4%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="probabilities-section">
+                        <h4 class="probabilities-title">All Emotion Probabilities</h4>
+                        <div id="probabilitiesList" class="probabilities-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How Our AI Model Works</h2>
+            <p class="section-subtitle">Understanding the technology behind emotion classification using deep learning and neural network techniques</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="feature-title">Bidirectional LSTM Neural Network</h3>
+                    <p class="feature-description">
+                        Our model uses a sophisticated bidirectional LSTM architecture that processes text in both forward and backward directions, capturing complete contextual information for accurate emotion detection.
+                    </p>
+                    <button onclick="openModal('lstm')" class="learn-more-btn">
+                        Learn More <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <h3 class="feature-title">BERT Tokenization</h3>
+                    <p class="feature-description">
+                        Advanced text preprocessing using BERT tokenizer converts human language into numerical representations, handling complex language nuances and out-of-vocabulary words effectively.
+                    </p>
+                    <button onclick="openModal('bert')" class="learn-more-btn">
+                        Learn More <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3 class="feature-title">Multi-Class Classification</h3>
+                    <p class="feature-description">
+                        Our system performs sophisticated multi-class classification, distinguishing between six different emotions with confidence scores and probability distributions.
+                    </p>
+                    <button onclick="openModal('classification')" class="learn-more-btn">
+                        Learn More <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Technical Specifications -->
+            <div class="tech-specs">
+                <h3 class="tech-title">Technical Specifications</h3>
+                <div class="tech-grid">
+                    <div class="tech-item">
+                        <span class="tech-label">Model Architecture</span>
+                        <span class="tech-value">Bidirectional LSTM</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-label">Vocabulary Size</span>
+                        <span class="tech-value">30,522 tokens</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-label">Embedding Dimension</span>
+                        <span class="tech-value">100</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-label">Hidden Dimension</span>
+                        <span class="tech-value">256</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-label">Number of Layers</span>
+                        <span class="tech-value">2</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-label">Dropout Rate</span>
+                        <span class="tech-value">0.5</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-label">Max Sequence Length</span>
+                        <span class="tech-value">128 tokens</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-label">Output Classes</span>
+                        <span class="tech-value">6 emotions</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Research Section -->
+            <div class="research-section">
+                <div class="research-card">
+                    <div class="research-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="research-title">Comprehensive Machine Learning Series</h3>
+                    <p class="research-description">
+                      Explore my complete machine learning article series on DEV Community, covering everything from fundamental concepts and mathematical foundations to advanced algorithms, neural networks, and practical implementations.
+                    </p>
+                    <button onclick="window.open('https://dev.to/dev_patel_35864ca1db6093c/series/31902', '_blank')" class="research-btn">
+                      <i class="fas fa-external-link-alt"></i>
+                      Read ML Article Series on DEV.to
+                    </button>
+                  </div>
+                </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-main">
+                    <h3 class="footer-title">Emotion Classifier</h3>
+                    <p class="footer-description">
+                        Built with PyTorch, Flask, and modern web technologies. Leveraging state-of-the-art deep learning for accurate emotion detection.
+                    </p>
+                </div>
+                
+                <div class="footer-links">
+                    <a href="https://github.com/Devpatel1012" target="_blank" class="social-link">
+                        <i class="fab fa-github"></i>
+                        <span>GitHub</span>
+                    </a>
+                    <a href="https://linkedin.com/in/dev-delvadiya-5160a7265" target="_blank" class="social-link">
+                        <i class="fab fa-linkedin"></i>
+                        <span>LinkedIn</span>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Dev Delvadiya. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <!-- LSTM Modal -->
+    <div id="lstmModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-section">
+                    <div class="modal-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="modal-title">Bidirectional LSTM Neural Network</h3>
+                </div>
+                <button onclick="closeModal('lstm')" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p class="modal-intro">
+                    The core of our emotion prediction system is a sophisticated bidirectional LSTM (Long Short-Term Memory) neural network. This architecture excels at processing sequential data like text by maintaining memory of both past and future context.
+                </p>
+
+                <h4 class="modal-section-title">Architecture Components:</h4>
+                <div class="modal-list">
+                    <div class="modal-list-item">
+                        <div class="list-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="list-content">
+                            <strong>Embedding Layer:</strong> Converts words into dense 100-dimensional vectors, allowing the model to understand semantic relationships between words.
+                        </div>
+                    </div>
+                    <div class="modal-list-item">
+                        <div class="list-icon">
+                            <i class="fas fa-arrows-alt-h"></i>
+                        </div>
+                        <div class="list-content">
+                            <strong>Bidirectional LSTM:</strong> Processes text in both forward and backward directions with 256 hidden units, capturing complete contextual information.
+                        </div>
+                    </div>
+                    <div class="modal-list-item">
+                        <div class="list-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="list-content">
+                            <strong>Dropout Regularization:</strong> Prevents overfitting with 50% dropout rate, ensuring the model generalizes well to new text.
+                        </div>
+                    </div>
+                    <div class="modal-list-item">
+                        <div class="list-icon">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div class="list-content">
+                            <strong>Classification Layer:</strong> Maps the 512-dimensional LSTM output to 6 emotion categories using a fully connected layer.
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="modal-section-title">Key Advantages:</h4>
+                <ul class="modal-advantages">
+                    <li>Captures long-range dependencies in text sequences</li>
+                    <li>Bidirectional processing provides complete context understanding</li>
+                    <li>Robust to varying text lengths and styles</li>
+                    <li>Achieves high accuracy across all emotion categories</li>
+                </ul>
+
+                <div class="modal-resources">
+                    <h4 class="modal-section-title">Learn More:</h4>
+                    <div class="resource-links">
+                        <a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/" target="_blank" class="resource-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            Understanding LSTM Networks
+                        </a>
+                        <a href="https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html" target="_blank" class="resource-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            PyTorch LSTM Tutorial
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BERT Modal -->
+    <div id="bertModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-section">
+                    <div class="modal-icon">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <h3 class="modal-title">BERT Tokenization</h3>
+                </div>
+                <button onclick="closeModal('bert')" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p class="modal-intro">
+                    Our system uses BERT (Bidirectional Encoder Representations from Transformers) tokenization for advanced text preprocessing. This approach handles complex language patterns and ensures robust text understanding.
+                </p>
+
+                <h4 class="modal-section-title">Tokenization Process:</h4>
+                <div class="modal-list">
+                    <div class="modal-list-item">
+                        <div class="list-icon">
+                            <i class="fas fa-cut"></i>
+                        </div>
+                        <div class="list-content">
+                            <strong>Subword Tokenization:</strong> Breaks text into meaningful subword units, handling out-of-vocabulary words and rare terms effectively.
+                        </div>
+                    </div>
+                    <div class="modal-list-item">
+                        <div class="list-icon">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <div class="list-content">
+                            <strong>Special Tokens:</strong> Adds [CLS] and [SEP] tokens to mark sentence boundaries and classification points.
+                        </div>
+                    </div>
+                    <div class="modal-list-item">
+                        <div class="list-icon">
+                            <i class="fas fa-hashtag"></i>
+                        </div>
+                        <div class="list-content">
+                            <strong>Numerical Conversion:</strong> Converts tokens to numerical IDs from a 30,522 token vocabulary for neural network processing.
+                        </div>
+                    </div>
+                    <div class="modal-list-item">
+                        <div class="list-icon">
+                            <i class="fas fa-ruler"></i>
+                        </div>
+                        <div class="list-content">
+                            <strong>Sequence Normalization:</strong> Pads or truncates sequences to 128 tokens for consistent batch processing.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-performance">
+                    <h4 class="modal-section-title">Performance Benefits:</h4>
+                    <div class="performance-grid">
+                        <div class="performance-item">
+                            <div class="performance-value">30,522</div>
+                            <div class="performance-label">Vocabulary Size</div>
+                        </div>
+                        <div class="performance-item">
+                            <div class="performance-value">128</div>
+                            <div class="performance-label">Max Tokens</div>
+                        </div>
+                        <div class="performance-item">
+                            <div class="performance-value">99.8%</div>
+                            <div class="performance-label">Coverage Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-resources">
+                    <h4 class="modal-section-title">Learn More:</h4>
+                    <div class="resource-links">
+                        <a href="https://huggingface.co/docs/transformers/model_doc/bert" target="_blank" class="resource-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            BERT Documentation
+                        </a>
+                        <a href="https://arxiv.org/abs/1810.04805" target="_blank" class="resource-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            BERT Research Paper
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Classification Modal -->
+    <div id="classificationModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-section">
+                    <div class="modal-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3 class="modal-title">Multi-Class Classification</h3>
+                </div>
+                <button onclick="closeModal('classification')" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p class="modal-intro">
+                    Our system performs sophisticated multi-class classification to distinguish between six fundamental emotions: sadness, joy, love, anger, fear, and surprise. Each prediction includes detailed probability distributions and confidence metrics.
+                </p>
+
+                <h4 class="modal-section-title">Classification Process:</h4>
+                <div class="modal-list">
+                    <div class="modal-list-item">
+                        <div class="list-icon">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <div class="list-content">
+                            <strong>Softmax Activation:</strong> Converts raw neural network outputs into normalized probability distributions across all six emotion classes.
+                        </div>
+                    </div>
+                    <div class="modal-list-item">
+                        <div class="list-icon">
+                            <i class="fas fa-target"></i>
+                        </div>
+                        <div class="list-content">
+                            <strong>Cross-Entropy Loss:</strong> Optimizes model training using cross-entropy loss with Adam optimizer for effective gradient-based learning.
+                        </div>
+                    </div>
+                    <div class="modal-list-item">
+                        <div class="list-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="list-content">
+                            <strong>Confidence Scoring:</strong> Provides reliability metrics for each prediction, helping users understand prediction certainty.
+                        </div>
+                    </div>
+                    <div class="modal-list-item">
+                        <div class="list-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <div class="list-content">
+                            <strong>Balanced Training:</strong> Trained on balanced datasets to ensure fair representation across all emotion categories.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-performance">
+                    <h4 class="modal-section-title">Model Performance:</h4>
+                    <div class="performance-grid">
+                        <div class="performance-item">
+                            <div class="performance-value">93.2%</div>
+                            <div class="performance-label">Accuracy</div>
+                        </div>
+                        <div class="performance-item">
+                            <div class="performance-value">93.07%</div>
+                            <div class="performance-label">F1-Score</div>
+                        </div>
+                        <div class="performance-item">
+                            <div class="performance-value">6</div>
+                            <div class="performance-label">Emotion Classes</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="emotion-classes">
+                    <h4 class="modal-section-title">Emotion Categories:</h4>
+                    <div class="emotion-grid">
+                        <div class="emotion-class">
+                            <i class="fas fa-frown emotion-sadness"></i>
+                            <span>Sadness</span>
+                        </div>
+                        <div class="emotion-class">
+                            <i class="fas fa-smile emotion-joy"></i>
+                            <span>Joy</span>
+                        </div>
+                        <div class="emotion-class">
+                            <i class="fas fa-heart emotion-love"></i>
+                            <span>Love</span>
+                        </div>
+                        <div class="emotion-class">
+                            <i class="fas fa-angry emotion-anger"></i>
+                            <span>Anger</span>
+                        </div>
+                        <div class="emotion-class">
+                            <i class="fas fa-exclamation-triangle emotion-fear"></i>
+                            <span>Fear</span>
+                        </div>
+                        <div class="emotion-class">
+                            <i class="fas fa-surprise emotion-surprise"></i>
+                            <span>Surprise</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-resources">
+                    <h4 class="modal-section-title">Learn More:</h4>
+                    <div class="resource-links">
+                        <a href="https://paperswithcode.com/task/emotion-classification" target="_blank" class="resource-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            Emotion Classification Research
+                        </a>
+                        <a href="https://scikit-learn.org/stable/modules/multiclass.html" target="_blank" class="resource-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            Multi-class Classification Guide
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

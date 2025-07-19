@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Classifier - AI-Powered Text Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            padding: 2rem 0;
+            text-align: center;
+            background: rgba(15, 15, 35, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .emotion-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .emotion-tag {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.875rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .emotion-tag:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Main Demo Section */
+        .demo-section {
+            padding: 4rem 0;
+        }
+
+        .demo-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .demo-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-description {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+        }
+
+        .text-input::placeholder {
+            color: #64748b;
+        }
+
+        .analyze-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .analyze-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Results Section */
+        .results-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        .results-card.show {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-emotion {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .result-confidence {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .probabilities-section {
+            margin-top: 1.5rem;
+        }
+
+        .probabilities-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+        }
+
+        .probability-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .probability-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .probability-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 0 1rem;
+            overflow: hidden;
+        }
+
+        .probability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+            transition: width 0.8s ease;
+        }
+
+        .probability-value {
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: #94a3b8;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            padding: 4rem 0;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-description {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        /* Technical Details */
+        .tech-details {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .tech-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tech-item:last-child {
+            border-bottom: none;
+        }
+
+        .tech-label {
+            font-weight: 500;
+            color: #cbd5e1;
+        }
+
+        .tech-value {
+            font-family: 'Courier New', monospace;
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-description {
+            color: #94a3b8;
+            margin-bottom: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .demo-card {
+                padding: 1.5rem;
+                margin: 0 1rem;
+            }
+            
+            .emotion-tags {
+                justify-content: center;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Emotion Colors */
+        .emotion-sadness { color: #60a5fa; }
+        .emotion-joy { color: #fbbf24; }
+        .emotion-love { color: #f472b6; }
+        .emotion-anger { color: #ef4444; }
+        .emotion-fear { color: #a855f7; }
+        .emotion-surprise { color: #10b981; }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <div class="badge">
+                <i class="fas fa-brain"></i>
+                AI-Powered Emotion Detection
+            </div>
+            <h1 class="main-title">Emotion Classifier</h1>
+            <p class="subtitle">
+                Discover the emotional tone of any text using advanced deep learning. Our LSTM-based model analyzes text and identifies six core emotions with high accuracy.
+            </p>
+            <div class="emotion-tags">
+                <div class="emotion-tag">
+                    <i class="fas fa-heart emotion-love"></i>
+                    Love
+                </div>
+                <div class="emotion-tag">
+                    <i class="fas fa-smile emotion-joy"></i>
+                    Joy
+                </div>
+                <div class="emotion-tag">
+                    <i class="fas fa-frown emotion-sadness"></i>
+                    Sadness
+                </div>
+                <div class="emotion-tag">
+                    <i class="fas fa-angry emotion-anger"></i>
+                    Anger
+                </div>
+                <div class="emotion-tag">
+                    <i class="fas fa-exclamation-triangle emotion-fear"></i>
+                    Fear
+                </div>
+                <div class="emotion-tag">
+                    <i class="fas fa-surprise emotion-surprise"></i>
+                    Surprise
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Demo Section -->
+    <section class="demo-section">
+        <div class="container">
+            <div class="demo-card">
+                <div class="demo-header">
+                    <h2 class="demo-title">Try It Now</h2>
+                    <p class="demo-description">Enter any text below to analyze its emotional content</p>
+                </div>
+                
+                <div class="input-group">
+                    <textarea 
+                        id="inputText" 
+                        class="text-input" 
+                        placeholder="Enter text here to classify its emotion... (e.g., 'I'm so excited about my vacation tomorrow!')"
+                    ></textarea>
+                </div>
+                
+                <button id="analyzeBtn" class="analyze-btn" onclick="classifyEmotion()">
+                    <i class="fas fa-bolt"></i>
+                    <span id="btnText">Classify Emotion</span>
+                </button>
+                
+                <div id="errorMessage" class="error-message"></div>
+                
+                <div id="resultsCard" class="results-card">
+                    <div class="result-header">
+                        <i id="resultIcon" class="fas fa-heart" style="font-size: 1.5rem;"></i>
+                        <span id="resultEmotion" class="result-emotion">Joy</span>
+                        <span id="resultConfidence" class="result-confidence">85.4%</span>
+                    </div>
+                    
+                    <div class="probabilities-section">
+                        <h4 class="probabilities-title">All Emotion Probabilities</h4>
+                        <div id="probabilitiesList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">Understanding the technology behind emotion classification using deep learning</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="feature-title">Deep Learning Model</h3>
+                    <p class="feature-description">
+                        Our model uses a sophisticated LSTM (Long Short-Term Memory) neural network architecture that can understand context and emotional nuances in text sequences.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <h3 class="feature-title">BERT Tokenization</h3>
+                    <p class="feature-description">
+                        Text preprocessing uses BERT tokenizer for advanced text understanding, converting words into numerical representations that the model can process.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Bidirectional Processing</h3>
+                    <p class="feature-description">
+                        The bidirectional LSTM processes text in both forward and backward directions, capturing complete contextual information for accurate predictions.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-target"></i>
+                    </div>
+                    <h3 class="feature-title">Six Emotion Classes</h3>
+                    <p class="feature-description">
+                        Trained to recognize six fundamental emotions: Love, Joy, Sadness, Anger, Fear, and Surprise with confidence scores for each prediction.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="tech-details">
+                <h3 class="feature-title" style="text-align: center; margin-bottom: 2rem;">Technical Specifications</h3>
+                <div class="tech-grid">
+                    <div>
+                        <div class="tech-item">
+                            <span class="tech-label">Model Type</span>
+                            <span class="tech-value">Bidirectional LSTM</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-label">Vocabulary Size</span>
+                            <span class="tech-value">30,522 tokens</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-label">Embedding Dimension</span>
+                            <span class="tech-value">100</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-label">Hidden Dimension</span>
+                            <span class="tech-value">256</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="tech-item">
+                            <span class="tech-label">Number of Layers</span>
+                            <span class="tech-value">2</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-label">Dropout Rate</span>
+                            <span class="tech-value">0.5</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-label">Max Sequence Length</span>
+                            <span class="tech-value">128 tokens</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-label">Output Classes</span>
+                            <span class="tech-value">6 emotions</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <h3 class="footer-title">Emotion Classifier</h3>
+            <p class="footer-description">Built with PyTorch, Flask, and modern web technologies</p>
+        </div>
+    </footer>
+
+    <script>
+        const emotionIcons = {
+            'sadness': 'fas fa-frown',
+            'joy': 'fas fa-smile',
+            'love': 'fas fa-heart',
+            'anger': 'fas fa-angry',
+            'fear': 'fas fa-exclamation-triangle',
+            'surprise': 'fas fa-surprise'
+        };
+
+        const emotionColors = {
+            'sadness': '#60a5fa',
+            'joy': '#fbbf24',
+            'love': '#f472b6',
+            'anger': '#ef4444',
+            'fear': '#a855f7',
+            'surprise': '#10b981'
+        };
+
+        async function classifyEmotion() {
+            const inputText = document.getElementById('inputText').value;
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const btnText = document.getElementById('btnText');
+            const errorMessage = document.getElementById('errorMessage');
+            const resultsCard = document.getElementById('resultsCard');
+
+            // Clear previous results and errors
+            errorMessage.classList.remove('show');
+            resultsCard.classList.remove('show');
+            errorMessage.textContent = '';
+
+            if (!inputText.trim()) {
+                showError('Please enter some text.');
+                return;
+            }
+
+            // Show loading state
+            analyzeBtn.disabled = true;
+            btnText.innerHTML = '<div class="loading-spinner"></div> Analyzing...';
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: inputText })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    displayResults(result);
+                } else {
+                    showError(result.error || 'An unknown error occurred.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Could not connect to the server or an unexpected error occurred.');
+            } finally {
+                // Reset button state
+                analyzeBtn.disabled = false;
+                btnText.innerHTML = '<i class="fas fa-bolt"></i> Classify Emotion';
+            }
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+        }
+
+        function displayResults(result) {
+            const resultsCard = document.getElementById('resultsCard');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultEmotion = document.getElementById('resultEmotion');
+            const resultConfidence = document.getElementById('resultConfidence');
+            const probabilitiesList = document.getElementById('probabilitiesList');
+
+            // Update main result
+            const emotion = result.predicted_emotion;
+            const confidence = (parseFloat(result.confidence) * 100).toFixed(1);
+
+            resultIcon.className = emotionIcons[emotion];
+            resultIcon.style.color = emotionColors[emotion];
+            resultEmotion.textContent = emotion.charAt(0).toUpperCase() + emotion.slice(1);
+            resultEmotion.style.color = emotionColors[emotion];
+            resultConfidence.textContent = confidence + '%';
+
+            // Update probabilities
+            probabilitiesList.innerHTML = '';
+            Object.entries(result.all_probabilities).forEach(([emotionName, probability]) => {
+                const percentage = (probability * 100).toFixed(1);
+                
+                const probabilityItem = document.createElement('div');
+                probabilityItem.className = 'probability-item';
+                
+                probabilityItem.innerHTML = `
+                    <div class="probability-label">
+                        <i class="${emotionIcons[emotionName]}" style="color: ${emotionColors[emotionName]}"></i>
+                        ${emotionName.charAt(0).toUpperCase() + emotionName.slice(1)}
+                    </div>
+                    <div class="probability-bar">
+                        <div class="probability-fill" style="width: ${percentage}%; background: ${emotionColors[emotionName]}"></div>
+                    </div>
+                    <div class="probability-value">${percentage}%</div>
+                `;
+                
+                probabilitiesList.appendChild(probabilityItem);
+            });
+
+            resultsCard.classList.add('show');
+        }
+
+        // Add enter key support for textarea
+        document.getElementById('inputText').addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'Enter') {
+                classifyEmotion();
+            }
+        });
+
+        // Add some example texts on page load
+        window.addEventListener('load', function() {
+            const examples = [
+                "I'm so excited about my vacation tomorrow!",
+                "I can't believe you would do this to me.",
+                "I miss you so much, my heart aches.",
+                "This is the best day of my life!",
+                "I'm really worried about the exam results.",
+                "Wow, I never expected this to happen!"
+            ];
+            
+            // You can add a feature to cycle through examples if needed
+        });
+    </script>
+</body>
+</html>
