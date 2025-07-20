@@ -110,7 +110,6 @@ def predict():
         print(f"Prediction failed for text '{text}': {e}")
         return jsonify({"error": f"Prediction failed due to an internal error. Please try again. Details: {e}"}), 500
 
-app = Flask(__name__)
 if __name__ == '__main__':
     # Run the Flask app
     # For local development, debug=True is useful.
